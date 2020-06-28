@@ -24,8 +24,8 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "Digite sua senha"],
-    minlength: [6, "Senhas devem ser no mínimo 6 caractéres"],
-    maxlength: [12, "Senhas devem ser no máximo 12 caractéres"],
+    minlength: [6, "Senhas devem ser no mínimo 6 caracteres"],
+    maxlength: [12, "Senhas devem ser no máximo 12 caracteres"],
   },
   avatar: {
     type: String,
