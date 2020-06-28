@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res) => {
+const errorHandler = (err, req, res, next) => {
   console.log(err);
 
   let message = err.message || "Internal server error";

@@ -34,7 +34,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, token });
 });
 
-exports.signup = asyncHandler(async (req, res) => {
+exports.signup = asyncHandler(async (req, res, next) => {
   const { fullname, username, email, password } = req.body;
 
   const user = await User.create({ fullname, username, email, password });
@@ -44,7 +44,7 @@ exports.signup = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, token });
 });
 
-exports.me = asyncHandler(async (req, res) => {
+exports.me = asyncHandler(async (req, res, next) => {
   const { avatar, username, fullname, email, _id, website, bio } = req.user;
 
   res

@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Post = require("../models/Post");
 const asyncHandler = require("../middlewares/asyncHandler");
 
-exports.getUsers = asyncHandler(async (req, res) => {
+exports.getUsers = asyncHandler(async (req, res, next) => {
   let users = await User.find().select("-password").limit(5).lean().exec();
 
   users.forEach((user) => {
@@ -121,7 +121,7 @@ exports.unfollow = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: {} });
 });
 
-exports.feed = asyncHandler(async (req, res) => {
+exports.feed = asyncHandler(async (req, res, next) => {
   const following = req.user.following;
 
   const users = await User.find()
@@ -188,7 +188,7 @@ exports.searchUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: users });
 });
 
-exports.editUser = asyncHandler(async (req, res) => {
+exports.editUser = asyncHandler(async (req, res, next) => {
   const { avatar, username, fullname, website, bio, email } = req.body;
 
   const fieldsToUpdate = {};

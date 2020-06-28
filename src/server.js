@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const auth = require("./routes/auth");
 const user = require("./routes/user");
+const post = require("./routes/post");
 const connectToDb = require("./utils/db");
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -14,6 +15,7 @@ app.use(cors());
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/users", user);
+app.use("/api/v1/posts", post);
 
 app.use(errorHandler);
 
