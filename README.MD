@@ -7,3 +7,7 @@ Skilla Back-End é feito com Node(Express) + MongoDB.
 Na raíz do projeto, crie um .env a partir do .env-example e configure como se pede
 
 Então rode <code>yarn && yarn run dev</code> para iniciar o server.
+
+## Inspirado
+
+Inspirado no design do Instagram e em tutoriais encontrados no github, por exemplo <a href="https://github.com/hibiken/hackafy">Hackafy</a>

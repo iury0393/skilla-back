@@ -1,13 +1,13 @@
 {
-  "name": "instaclone-backend",
+  "name": "skilla-backend",
   "version": "1.0.0",
-  "description": "Instaclone backend using Express, MongoDB",
+  "description": "Skilla backend usando Node(Express) e MongoDB",
   "main": "src/server.js",
   "scripts": {
     "start": "NODE_ENV=production node src/server",
-    "dev": "nodemon src/server"
+    "dev": "NODE_ENV=development nodemon src/server"
   },
-  "author": "Manikandan Raji",
+  "author": "Iury Vasconcelos",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
