@@ -1,6 +1,12 @@
 const User = require("../models/User");
 const asyncHandler = require("../middlewares/asyncHandler");
 
+exports.users = asyncHandler(async (req, res, next) => {
+  const users = await User.find();
+
+  res.status(200).json({ success: true, data: users });
+})
+
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
