@@ -10,4 +10,4 @@ Então rode <code>yarn && yarn run dev</code> para iniciar o server.
 
 ## Inspirado
 
-Inspirado no design do Instagram e em tutoriais encontrados no github, por exemplo <a href="https://github.com/hibiken/hackafy">Hackafy</a>
+Inspirado no backend de tutoriais encontrados no github, por exemplo <a href="https://github.com/hibiken/hackafy">Hackafy</a>
