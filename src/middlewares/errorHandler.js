@@ -1,3 +1,4 @@
+//Cria uma função para lidar com erros mais comuns, ao inves de ficar repetindo
 const errorHandler = (err, req, res, next) => {
   console.log(err);
 

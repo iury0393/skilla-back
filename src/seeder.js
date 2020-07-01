@@ -16,7 +16,7 @@ const deleteData = async () => {
     await User.deleteMany();
     await Comment.deleteMany();
     await Post.deleteMany();
-    console.log("Deleted data...");
+    console.log("Deletando a data...");
     process.exit();
   } catch (err) {
     console.error(err);
@@ -26,6 +26,6 @@ const deleteData = async () => {
 if (process.argv[2] === "-d") {
   deleteData();
 } else {
-  console.log("not enough arguments");
+  console.log("Sem informações necessárias");
   process.exit(1);
 }

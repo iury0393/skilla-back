@@ -3,13 +3,13 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const Comment = require("../models/Comment");
 const asyncHandler = require("../middlewares/asyncHandler");
-
+//Pega todos os posts no banco
 exports.getPosts = asyncHandler(async (req, res, next) => {
   const posts = await Post.find();
 
   res.status(200).json({ success: true, data: posts });
 });
-
+//Pega um post específico
 exports.getPost = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id)
     .populate({
@@ -29,23 +29,23 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 
   if (!post) {
     return next({
-      message: `No post found for id ${req.params.id}`,
+      message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
 
-  // is the post belongs to loggedin user?
+  //A publicação pertence ao usuário logado?
   post.isMine = req.user.id === post.user._id.toString();
 
-  // is the loggedin user liked the post??
+  //O usuário logado gostou da postagem? EM CONSTRUÇÃO
   const likes = post.likes.map((like) => like.toString());
   post.isLiked = likes.includes(req.user.id);
 
-  // is the loggedin user liked the post??
+  //O usuário logado salvou a postagem? EM CONSTRUÇÃO
   const savedPosts = req.user.savedPosts.map((post) => post.toString());
   post.isSaved = savedPosts.includes(req.params.id);
 
-  // is the comment on the post belongs to the logged in user?
+  //O comentário da postagem pertence ao usuário conectado? EM CONSTRUÇÃO
   post.comments.forEach((comment) => {
     comment.isCommentMine = false;
 
@@ -57,59 +57,59 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: post });
 });
-
+//Deleta um post, se esse post pertencer ao usuário logado
 exports.deletePost = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
-
+  //Encontra os posts do id do usuário
   if (!post) {
     return next({
-      message: `No post found for id ${req.params.id}`,
+      message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
-
+  //Checa se o post é do usuario logado
   if (post.user.toString() !== req.user.id) {
     return next({
-      message: "You are not authorized to delete this post",
+      message: "Você não está autorizado a deletar esse post",
       statusCode: 401,
     });
   }
-
+  //Encontra o id do usuário no banco e remove -1 ao contador de post nele
   await User.findByIdAndUpdate(req.user.id, {
     $pull: { posts: req.params.id },
     $inc: { postCount: -1 },
   });
-
+  //Remove o post
   await post.remove();
 
   res.status(200).json({ success: true, data: {} });
 });
-
+//Adiciona um post
 exports.addPost = asyncHandler(async (req, res, next) => {
   const { caption, files, tags } = req.body;
   const user = req.user.id;
-
+  //Cria o post como o Model pede
   let post = await Post.create({ caption, files, tags, user });
-
+  //Encontra o id do usuário no banco e adiciona +1 ao contador de post nele
   await User.findByIdAndUpdate(req.user.id, {
     $push: { posts: post._id },
     $inc: { postCount: 1 },
   });
-
+  //Faz um replace do caminho específico do documento "user" com o outro documento "post" no banco
   post = await post
     .populate({ path: "user", select: "avatar username fullname" })
     .execPopulate();
 
   res.status(200).json({ success: true, data: post });
 });
-
+//EM CONSTRUÇÃO
 exports.toggleLike = asyncHandler(async (req, res, next) => {
-  // make sure that the post exists
+
   const post = await Post.findById(req.params.id);
 
   if (!post) {
     return next({
-      message: `No post found for id ${req.params.id}`,
+      message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
@@ -127,13 +127,13 @@ exports.toggleLike = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: {} });
 });
-
+//EM CONSTRUÇÃO
 exports.addComment = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
 
   if (!post) {
     return next({
-      message: `No post found for id ${req.params.id}`,
+      message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
@@ -154,13 +154,13 @@ exports.addComment = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: comment });
 });
-
+//EM CONSTRUÇÃO
 exports.deleteComment = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
 
   if (!post) {
     return next({
-      message: `No post found for id ${req.params.id}`,
+      message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
@@ -172,19 +172,18 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
 
   if (!comment) {
     return next({
-      message: `No comment found for id ${req.params.id}`,
+      message: `Nenhum comentário encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
 
   if (comment.user.toString() !== req.user.id) {
     return next({
-      message: "You are not authorized to delete this comment",
+      message: "Você não está autorizado a deletar este comentário",
       statusCode: 401,
     });
   }
 
-  // remove the comment from the post
   const index = post.comments.indexOf(comment._id);
   post.comments.splice(index, 1);
   post.commentsCount = post.commentsCount - 1;
@@ -194,11 +193,11 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: {} });
 });
-
+//EM CONSTRUÇÃO
 exports.searchPost = asyncHandler(async (req, res, next) => {
   if (!req.query.caption && !req.query.tag) {
     return next({
-      message: "Please enter either caption or tag to search for",
+      message: "Escreva o título da postagem para procurar",
       statusCode: 400,
     });
   }
@@ -216,14 +215,13 @@ exports.searchPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: posts });
 });
-
+//EM CONSTRUÇÃO
 exports.toggleSave = asyncHandler(async (req, res, next) => {
-  // make sure that the post exists
   const post = await Post.findById(req.params.id);
 
   if (!post) {
     return next({
-      message: `No post found for id ${req.params.id}`,
+      message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
@@ -231,12 +229,12 @@ exports.toggleSave = asyncHandler(async (req, res, next) => {
   const { user } = req;
 
   if (user.savedPosts.includes(req.params.id)) {
-    console.log("removing saved post");
+    console.log("Removendo post Salvo");
     await User.findByIdAndUpdate(user.id, {
       $pull: { savedPosts: req.params.id },
     });
   } else {
-    console.log("saving post");
+    console.log("Salvando post");
     await User.findByIdAndUpdate(user.id, {
       $push: { savedPosts: req.params.id },
     });

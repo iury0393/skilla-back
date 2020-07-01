@@ -55,19 +55,19 @@ const UserSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
+//Encripta a senha antes de salvar no banco
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
+//Pega o token gerado no registro do novo usuário
 UserSchema.methods.getJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
-
+//Checa a senha quando for fazer o login
 UserSchema.methods.checkPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
