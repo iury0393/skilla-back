@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
+//Cria uma função que obriga o usuário a se logar para visitar páginas do site.
 exports.protect = async (req, res, next) => {
   let token;
 

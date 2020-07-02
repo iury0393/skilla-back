@@ -1,12 +1,12 @@
 const User = require("../models/User");
 const asyncHandler = require("../middlewares/asyncHandler");
-
+//Retorna uma lista com usuários cadastrador
 exports.users = asyncHandler(async (req, res, next) => {
   const users = await User.find();
 
   res.status(200).json({ success: true, data: users });
 })
-
+//Faz a validação para realizar o login
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -39,17 +39,17 @@ exports.login = asyncHandler(async (req, res, next) => {
   // Então manda o json como resposta
   res.status(200).json({ success: true, token });
 });
-
+//Faz a validação, e envio para o banco, de um novo usuário
 exports.signup = asyncHandler(async (req, res, next) => {
   const { fullname, username, email, password } = req.body;
-
+  //Cria o usuário de acordo com o Model
   const user = await User.create({ fullname, username, email, password });
-
+  //Gera o token do usuário
   const token = user.getJwtToken();
 
   res.status(200).json({ success: true, token });
 });
-
+//Checa o usuário logado e retorna com suas outras informações no banco 
 exports.me = asyncHandler(async (req, res, next) => {
   const { avatar, username, fullname, email, _id, website, bio } = req.user;
 

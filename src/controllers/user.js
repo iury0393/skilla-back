@@ -1,10 +1,10 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const asyncHandler = require("../middlewares/asyncHandler");
-
+//Retorna todos os usuários da plataforma
 exports.getUsers = asyncHandler(async (req, res, next) => {
   let users = await User.find().select("-password").limit(5).lean().exec();
-
+  //Checa os seguidores e se o usuário logado está seguindo ou não
   users.forEach((user) => {
     user.isFollowing = false;
     const followers = user.followers.map((follower) => follower._id.toString());
@@ -17,7 +17,7 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: users });
 });
-
+//Retorna um usuário da plataforma
 exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ username: req.params.username })
     .select("-password")
@@ -27,7 +27,7 @@ exports.getUser = asyncHandler(async (req, res, next) => {
     .populate({ path: "following", select: "avatar username fullname" })
     .lean()
     .exec();
-
+  //Checa se o usuário existe
   if (!user) {
     return next({
       message: `O usuário ${req.params.username} não foi encontrado`,
@@ -37,30 +37,30 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 
   user.isFollowing = false;
   const followers = user.followers.map((follower) => follower._id.toString());
-
+  //Pega os seguidores do usuário
   user.followers.forEach((follower) => {
     follower.isFollowing = false;
     if (req.user.following.includes(follower._id.toString())) {
       follower.isFollowing = true;
     }
   });
-
+  //Pega os seguindo do usuário
   user.following.forEach((user) => {
     user.isFollowing = false;
     if (req.user.following.includes(user._id.toString())) {
       user.isFollowing = true;
     }
   });
-
+  //Se o usuário logado está seguindo, vai ser incluido na lista de seguidores
   if (followers.includes(req.user.id)) {
     user.isFollowing = true;
   }
-
+  //Checa se esta vendo o seu ou outro usuário
   user.isMe = req.user.id === user._id.toString();
 
   res.status(200).json({ success: true, data: user });
 });
-
+//Cria o seguindo de um usuário
 exports.follow = asyncHandler(async (req, res, next) => {
   // Checa se o usuário existe
   const user = await User.findById(req.params.id);
@@ -81,7 +81,7 @@ exports.follow = asyncHandler(async (req, res, next) => {
   if (user.followers.includes(req.user.id)) {
     return next({ message: "Você já está seguindo ele", status: 400 });
   }
-
+  //Faz update no banco dos seguidores e seguindo
   await User.findByIdAndUpdate(req.params.id, {
     $push: { followers: req.user.id },
     $inc: { followersCount: 1 },
@@ -93,10 +93,10 @@ exports.follow = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: {} });
 });
-
+//Cria o seguidor de um usuário
 exports.unfollow = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
-
+  //Checa se o usuário existe
   if (!user) {
     return next({
       message: `Nenhum usuário encontrado para o id: ${req.params.id}`,
@@ -108,7 +108,7 @@ exports.unfollow = asyncHandler(async (req, res, next) => {
   if (req.params.id === req.user.id) {
     return next({ message: "Você não pode seguir você mesmo", status: 400 });
   }
-
+  //Faz o update no banco dos seguidores e seguindo
   await User.findByIdAndUpdate(req.params.id, {
     $pull: { followers: req.user.id },
     $inc: { followersCount: -1 },
@@ -120,7 +120,7 @@ exports.unfollow = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: {} });
 });
-
+//Mostra o feed do usuário
 exports.feed = asyncHandler(async (req, res, next) => {
   const following = req.user.following;
 
@@ -176,10 +176,10 @@ exports.feed = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: posts });
 });
-
+//EM CONSTRUÇÃO
 exports.searchUser = asyncHandler(async (req, res, next) => {
   if (!req.query.username) {
-    return next({ message: "The username cannot be empty", statusCode: 400 });
+    return next({ message: "O nome de usuário não pode ser vazio", statusCode: 400 });
   }
 
   const regex = new RegExp(req.query.username, "i");
@@ -187,16 +187,16 @@ exports.searchUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: users });
 });
-
+//Edita o  usuário
 exports.editUser = asyncHandler(async (req, res, next) => {
   const { avatar, username, fullname, website, bio, email } = req.body;
-
+  //Cria o array para os campos que vão ser editados
   const fieldsToUpdate = {};
   if (avatar) fieldsToUpdate.avatar = avatar;
   if (username) fieldsToUpdate.username = username;
   if (fullname) fieldsToUpdate.fullname = fullname;
   if (email) fieldsToUpdate.email = email;
-
+  //Encontra o usuário pelo id e faz o update com os novos valores
   const user = await User.findByIdAndUpdate(
     req.user.id,
     {
