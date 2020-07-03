@@ -102,18 +102,18 @@ exports.addPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: post });
 });
-//EM CONSTRUÇÃO
+//Cria o like no banco para tirar e remover o like
 exports.toggleLike = asyncHandler(async (req, res, next) => {
 
   const post = await Post.findById(req.params.id);
-
+  //Encontra os posts do id do usuário
   if (!post) {
     return next({
       message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
-
+  //Depois de encontrado, dar um like incrementando ou decrementando
   if (post.likes.includes(req.user.id)) {
     const index = post.likes.indexOf(req.user.id);
     post.likes.splice(index, 1);
@@ -127,68 +127,70 @@ exports.toggleLike = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: {} });
 });
-//EM CONSTRUÇÃO
+//Adiciona o comentário no banco
 exports.addComment = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
-
+  //Encontra os posts do id do usuário
   if (!post) {
     return next({
       message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
-
+  //Cria o comentario pegando parametros, o usuário do comentário, o Post e o texto do comentário
   let comment = await Comment.create({
     user: req.user.id,
     post: req.params.id,
     text: req.body.text,
   });
 
+  //Faz um push, aumenta o numéro de comentários no banco e salva
   post.comments.push(comment._id);
   post.commentsCount = post.commentsCount + 1;
   await post.save();
 
+  //Mostra o comentário no post do usuário
   comment = await comment
     .populate({ path: "user", select: "avatar username fullname" })
     .execPopulate();
 
   res.status(200).json({ success: true, data: comment });
 });
-//EM CONSTRUÇÃO
+//Deleta o comentário
 exports.deleteComment = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
-
+  //Encontra os posts do id do usuário
   if (!post) {
     return next({
       message: `Nenhum post encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
-
+  //Procura o comentário pelo id e pelo post
   const comment = await Comment.findOne({
     _id: req.params.commentId,
     post: req.params.id,
   });
-
+  //Se não tem comentário com o id, mostra o erro
   if (!comment) {
     return next({
       message: `Nenhum comentário encontrado para o id ${req.params.id}`,
       statusCode: 404,
     });
   }
-
+  //Se o comentário fo de outra pessoa, não permite ser deletado
   if (comment.user.toString() !== req.user.id) {
     return next({
       message: "Você não está autorizado a deletar este comentário",
       statusCode: 401,
     });
   }
-
+  //Pega o id do comentário selecionado, decrementa o comentário no banco e salva
   const index = post.comments.indexOf(comment._id);
   post.comments.splice(index, 1);
   post.commentsCount = post.commentsCount - 1;
   await post.save();
-
+  //Retira o comentário do banco
   await comment.remove();
 
   res.status(200).json({ success: true, data: {} });
