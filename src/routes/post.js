@@ -1,5 +1,4 @@
 const express = require("express");
-const { celebrate, Segments, Joi } = require('celebrate');
 const router = express.Router();
 const {
   getPosts,
