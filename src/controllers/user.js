@@ -176,17 +176,6 @@ exports.feed = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: posts });
 });
-//EM CONSTRUÇÃO
-exports.searchUser = asyncHandler(async (req, res, next) => {
-  if (!req.query.username) {
-    return next({ message: "O nome de usuário não pode ser vazio", statusCode: 400 });
-  }
-
-  const regex = new RegExp(req.query.username, "i");
-  const users = await User.find({ username: regex });
-
-  res.status(200).json({ success: true, data: users });
-});
 //Edita o  usuário
 exports.editUser = asyncHandler(async (req, res, next) => {
   const { avatar, username, fullname, website, bio, email } = req.body;

@@ -6,19 +6,15 @@ const {
   addPost,
   deletePost,
   toggleLike,
-  toggleSave,//EM CONSTRUÇÃO
   addComment,
   deleteComment,
-  searchPost,//EM CONSTRUÇÃO
 } = require("../controllers/post");
 const { protect } = require("../middlewares/auth");
 
 router.route("/").get(getPosts).post(protect, addPost);
-router.route("/search").get(searchPost);//EM CONSTRUÇÃO
 router.route("/:id").get(protect, getPost).delete(protect, deletePost);
-router.route("/:id/togglelike").get(protect, toggleLike);
-router.route("/:id/togglesave").get(protect, toggleSave);//EM CONSTRUÇÃO
-router.route("/:id/comments").post(protect, addComment);
-router.route("/:id/comments/:commentId").delete(protect, deleteComment);
+router.get("/:id/togglelike", protect, toggleLike);
+router.post("/:id/comments", protect, addComment);
+router.delete("/:id/comments/:commentId", protect, deleteComment);
 
 module.exports = router;
