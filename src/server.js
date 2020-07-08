@@ -6,6 +6,7 @@ const user = require("./routes/user");
 const post = require("./routes/post");
 const connectToDb = require("./utils/db");
 const errorHandler = require("./middlewares/errorHandler");
+const { errors } = require("celebrate");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use("/auth", auth);
 app.use("/users", user);
 app.use("/posts", post);
+app.use(errors());
 
 app.use(errorHandler);
 

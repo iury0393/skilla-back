@@ -1,4 +1,5 @@
 const express = require("express");
+const { celebrate, Segments, Joi } = require('celebrate');
 const router = express.Router();
 const {
   getUsers,
@@ -10,11 +11,11 @@ const {
 } = require("../controllers/user");
 const { protect } = require("../middlewares/auth");
 
-router.route("/").get(protect, getUsers);
-router.route("/").put(protect, editUser);
-router.route("/feed").get(protect, feed);
-router.route("/:username").get(protect, getUser);
-router.route("/:id/follow").get(protect, follow);
-router.route("/:id/unfollow").get(protect, unfollow);
+router.get("/", protect, getUsers);
+router.put("/", protect, editUser);
+router.get("/feed", protect, feed);
+router.get("/:username", protect, getUser);
+router.get("/:id/follow", protect, follow);
+router.get("/:id/unfollow", protect, unfollow);
 
 module.exports = router;
