@@ -51,12 +51,12 @@ exports.signup = asyncHandler(async (req, res, next) => {
 });
 //Checa o usuário logado e retorna com suas outras informações no banco 
 exports.me = asyncHandler(async (req, res, next) => {
-  const { avatar, username, fullname, email, _id, website, bio } = req.user;
+  const { avatar, username, fullname, email, id, website, bio, followersCount, followers, followingCount, following, postCount, posts, createdAt } = req.user;
 
   res
     .status(200)
     .json({
       success: true,
-      data: { avatar, username, fullname, email, _id, website, bio },
+      data: { avatar, username, fullname, email, id, website, bio, followersCount, followers, followingCount, following, postCount, posts, createdAt },
     });
 });
