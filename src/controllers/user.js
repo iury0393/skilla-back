@@ -7,13 +7,13 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
   //Checa os seguidores e se o usuário logado está seguindo ou não
   users.forEach((user) => {
     user.isFollowing = false;
-    const followers = user.followers.map((follower) => follower.id.toString());
+    const followers = user.followers.map((follower) => follower._id.toString());
     if (followers.includes(req.user.id)) {
       user.isFollowing = true;
     }
   });
 
-  users = users.filter((user) => user.id.toString() !== req.user.id);
+  users = users.filter((user) => user._id.toString() !== req.user.id);
 
   res.status(200).json({ success: true, data: users });
 });
@@ -36,18 +36,18 @@ exports.getUser = asyncHandler(async (req, res, next) => {
   }
 
   user.isFollowing = false;
-  const followers = user.followers.map((follower) => follower.id.toString());
+  const followers = user.followers.map((follower) => follower._id.toString());
   //Pega os seguidores do usuário
   user.followers.forEach((follower) => {
     follower.isFollowing = false;
-    if (req.user.following.includes(follower.id.toString())) {
+    if (req.user.following.includes(follower._id.toString())) {
       follower.isFollowing = true;
     }
   });
   //Pega os seguindo do usuário
   user.following.forEach((user) => {
     user.isFollowing = false;
-    if (req.user.following.includes(user.id.toString())) {
+    if (req.user.following.includes(user._id.toString())) {
       user.isFollowing = true;
     }
   });
@@ -56,7 +56,7 @@ exports.getUser = asyncHandler(async (req, res, next) => {
     user.isFollowing = true;
   }
   //Checa se esta vendo o seu ou outro usuário
-  user.isMe = req.user.id === user.id.toString();
+  user.isMe = req.user.id === user._id.toString();
 
   res.status(200).json({ success: true, data: user });
 });
@@ -125,7 +125,7 @@ exports.feed = asyncHandler(async (req, res, next) => {
   const following = req.user.following;
 
   const users = await User.find()
-    .where("id")
+    .where("_id")
     .in(following.concat([req.user.id]))
     .exec();
 
@@ -139,7 +139,7 @@ exports.feed = asyncHandler(async (req, res, next) => {
     })
     .populate({ path: "user", select: "avatar fullname username" })
     .sort("-createdAt")
-    .where("id")
+    .where("_id")
     .in(postIds)
     .lean()
     .exec();
@@ -155,20 +155,20 @@ exports.feed = asyncHandler(async (req, res, next) => {
     // O usuário logado salvou o post
     post.isSaved = false;
     const savedPosts = req.user.savedPosts.map((post) => post.toString());
-    if (savedPosts.includes(post.id)) {
+    if (savedPosts.includes(post._id)) {
       post.isSaved = true;
     }
 
     // O post pertence ao usuário logado
     post.isMine = false;
-    if (post.user.id.toString() === req.user.id) {
+    if (post.user._id.toString() === req.user.id) {
       post.isMine = true;
     }
 
     // O comentário pertence ao usuário logado
     post.comments.map((comment) => {
       comment.isCommentMine = false;
-      if (comment.user.id.toString() === req.user.id) {
+      if (comment.user._id.toString() === req.user.id) {
         comment.isCommentMine = true;
       }
     });

@@ -63,7 +63,7 @@ UserSchema.pre("save", async function (next) {
 });
 //Pega o token gerado no registro do novo usuário
 UserSchema.methods.getJwtToken = function () {
-  return jwt.sign({ id: this.id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };

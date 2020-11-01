@@ -35,7 +35,7 @@ exports.getPost = asyncHandler(async (req, res, next) => {
   }
 
   //A publicação pertence ao usuário logado?
-  post.isMine = req.user.id === post.user.id.toString();
+  post.isMine = req.user.id === post.user._id.toString();
 
   //O usuário logado gostou da postagem? EM CONSTRUÇÃO
   const likes = post.likes.map((like) => like.toString());
@@ -49,7 +49,7 @@ exports.getPost = asyncHandler(async (req, res, next) => {
   post.comments.forEach((comment) => {
     comment.isCommentMine = false;
 
-    const userStr = comment.user.id.toString();
+    const userStr = comment.user._id.toString();
     if (userStr === req.user.id) {
       comment.isCommentMine = true;
     }
@@ -92,7 +92,7 @@ exports.addPost = asyncHandler(async (req, res, next) => {
   let post = await Post.create({ caption, files, tags, user });
   //Encontra o id do usuário no banco e adiciona +1 ao contador de post nele
   await User.findByIdAndUpdate(req.user.id, {
-    $push: { posts: post.id },
+    $push: { posts: post._id },
     $inc: { postCount: 1 },
   });
   //Faz um replace do caminho específico do documento "user" com o outro documento "post" no banco
@@ -145,7 +145,7 @@ exports.addComment = asyncHandler(async (req, res, next) => {
   });
 
   //Faz um push, aumenta o numéro de comentários no banco e salva
-  post.comments.push(comment.id);
+  post.comments.push(comment._id);
   post.commentsCount = post.commentsCount + 1;
   await post.save();
 
@@ -168,7 +168,7 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
   }
   //Procura o comentário pelo id e pelo post
   const comment = await Comment.findOne({
-    id: req.params.commentId,
+    _id: req.params.commentId,
     post: req.params.id,
   });
   //Se não tem comentário com o id, mostra o erro
@@ -186,7 +186,7 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
     });
   }
   //Pega o id do comentário selecionado, decrementa o comentário no banco e salva
-  const index = post.comments.indexOf(comment.id);
+  const index = post.comments.indexOf(comment._id);
   post.comments.splice(index, 1);
   post.commentsCount = post.commentsCount - 1;
   await post.save();
