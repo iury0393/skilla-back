@@ -213,5 +213,5 @@ exports.notification = asyncHandler(async (req, res, next) => {
   notification = await notification
   .execPopulate();
 
-  res.status(200).json({ success: true, data: {} });
+  res.status(200).json({ success: true, data: notification });
 });
