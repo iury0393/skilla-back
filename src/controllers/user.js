@@ -199,3 +199,19 @@ exports.editUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: user });
 });
+
+exports.notification = asyncHandler(async (req, res, next) => {
+  const { os, deviceToken } = req.body;
+  const user = req.user.id;
+
+  let notification = await Notification.create({ os, deviceToken, user });
+
+  await User.findByIdAndUpdate(req.user.id, {
+    $push: { notification: notification._id },
+  });
+
+  notification = await notification
+  .execPopulate();
+
+  res.status(200).json({ success: true, data: {} });
+});
