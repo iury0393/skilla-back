@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema({
     default: 0,
   },
   savedPosts: [{ type: mongoose.Schema.ObjectId, ref: "Post" }],
-  notification: { type: mongoose.Schema.ObjectId, ref: "Notification" },
+  notification: [{ type: mongoose.Schema.ObjectId, ref: "Notification" }],
   createdAt: {
     type: Date,
     default: Date.now,
